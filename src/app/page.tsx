@@ -32,7 +32,8 @@ export default function Home() {
       {/* Content Sections */}
       {loading ? (
         <div className="flex justify-center items-center h-64">
-          <LoadingSpinner size="lg" />
+          <LoadingSpinner /> 
+{/* <LoadingSpinner size="h-8 w-8" /> // Custom size */}
         </div>
       ) : error ? (
         <div className="flex justify-center">
