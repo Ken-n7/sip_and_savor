@@ -1,9 +1,13 @@
-// src/app/hooks/useApi.ts
 "use client";
 
 import { useState, useEffect, useCallback } from "react";
 import { Cocktail, Meal } from "@/types/recipe";
-import { fetchRandomCocktails, fetchRandomMeals } from "../lib/api";
+import { 
+  fetchRandomCocktails, 
+  fetchRandomMeals, 
+  getCocktailById, 
+  getMealById 
+} from "../lib/api";
 
 interface UseRandomRecipesResult {
   cocktails: Cocktail[];
@@ -12,6 +16,7 @@ interface UseRandomRecipesResult {
   error: string | null;
   refresh: (count?: number) => Promise<void>;
   isEmpty: boolean;
+  getRecipeById: (type: 'cocktail' | 'meal', id: string) => Promise<Cocktail | Meal | null>;
 }
 
 interface RecipeState {
@@ -86,6 +91,24 @@ export const useRandomRecipes = (initialCount = 6): UseRandomRecipesResult => {
     }
   }, []);
 
+  // New function to get a specific recipe by ID
+  const getRecipeById = useCallback(async (type: 'cocktail' | 'meal', id: string): Promise<Cocktail | Meal | null> => {
+    try {
+      if (type === 'cocktail') {
+        return await getCocktailById(id);
+      } else {
+        return await getMealById(id);
+      }
+    } catch (error) {
+      console.error(`Error fetching ${type} with ID ${id}:`, error);
+      setState(prev => ({
+        ...prev,
+        error: getErrorMessage(error)
+      }));
+      return null;
+    }
+  }, []);
+
   useEffect(() => {
     let mounted = true;
 
@@ -119,5 +142,6 @@ export const useRandomRecipes = (initialCount = 6): UseRandomRecipesResult => {
       !state.loading &&
       state.cocktails.length === 0 &&
       state.meals.length === 0,
+    getRecipeById,
   };
 };

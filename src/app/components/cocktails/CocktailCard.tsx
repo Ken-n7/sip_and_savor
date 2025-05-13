@@ -20,7 +20,8 @@ const CocktailCard = ({ cocktail }: CocktailCardProps) => {
       >
         <div className="relative aspect-[4/3] overflow-hidden bg-gray-100">
           <Image
-            src={cocktail.strDrinkThumb ? `${cocktail.strDrinkThumb}/medium` : '/placeholder-cocktail.jpg'}
+            src={cocktail.strDrinkThumb || '/placeholder-cocktail.jpg'}
+            // src={cocktail.strDrinkThumb ? `${cocktail.strDrinkThumb}/medium` : '/placeholder-cocktail.jpg'}
             alt={cocktail.strDrink}
             fill
             className="object-cover transition-transform duration-300 group-hover:scale-105"

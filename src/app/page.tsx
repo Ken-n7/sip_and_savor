@@ -14,7 +14,7 @@ export default function Home() {
   const router = useRouter();
 
   return (
-    <main className="container mx-auto px-4 py-24 max-w-7xl">
+    <main className="container mx-auto px-4 pt-24 max-w-7xl">
       {/* Hero Section */}
       <section className="text-center mb-16">
         <h1 className="text-5xl font-bold mb-6 text-primary">

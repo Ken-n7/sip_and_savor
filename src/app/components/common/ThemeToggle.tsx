@@ -15,7 +15,6 @@ export function ThemeToggle() {
 
   useEffect(() => {
     setMounted(true);
-    // Load color theme from localStorage if available
     const savedColorTheme = localStorage.getItem('color-theme') as ThemeKey;
     if (savedColorTheme && THEMES[savedColorTheme]) {
       setColorTheme(savedColorTheme);
@@ -31,13 +30,8 @@ export function ThemeToggle() {
   }
 
   const toggleTheme = () => {
-    if (theme === 'system') {
-      setTheme('dark');
-    } else if (theme === 'dark') {
-      setTheme('light');
-    } else {
-      setTheme('system');
-    }
+    const newTheme = theme === 'system' ? 'dark' : theme === 'dark' ? 'light' : 'system';
+    setTheme(newTheme);
   };
 
   const handleColorThemeChange = (newTheme: ThemeKey) => {
