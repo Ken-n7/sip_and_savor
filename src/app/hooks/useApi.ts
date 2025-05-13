@@ -1,30 +1,29 @@
+// src/app/hooks/useApi.ts
 "use client";
 
 import { useState, useEffect, useCallback } from "react";
+import { Cocktail, Meal } from "@/types/recipe";
 import { fetchRandomCocktails, fetchRandomMeals } from "../lib/api";
 
-interface Cocktail {
-  idDrink: string;
-  strDrink: string;
-  strDrinkThumb?: string;
-  [key: string]: any;
+interface UseRandomRecipesResult {
+  cocktails: Cocktail[];
+  meals: Meal[];
+  loading: boolean;
+  error: string | null;
+  refresh: (count?: number) => Promise<void>;
+  isEmpty: boolean;
 }
 
-interface Meal {
-  idMeal: string;
-  strMeal: string;
-  strMealThumb?: string;
-  [key: string]: any;
+interface RecipeState {
+  cocktails: Cocktail[];
+  meals: Meal[];
+  loading: boolean;
+  error: string | null;
+  retryCount: number;
 }
 
-export const useRandomRecipes = (initialCount = 6) => {
-  const [state, setState] = useState<{
-    cocktails: Cocktail[];
-    meals: Meal[];
-    loading: boolean;
-    error: string | null;
-    retryCount: number;
-  }>({
+export const useRandomRecipes = (initialCount = 6): UseRandomRecipesResult => {
+  const [state, setState] = useState<RecipeState>({
     cocktails: [],
     meals: [],
     loading: true,

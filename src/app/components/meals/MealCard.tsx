@@ -1,18 +1,9 @@
-// src/components/meals/MealCard.tsx
-'use client';
-
 import Image from 'next/image';
 import Link from 'next/link';
+import { Meal } from '@/types/recipe';
 
 interface MealCardProps {
-  meal: {
-    idMeal: string;
-    strMeal: string;
-    strMealThumb?: string;
-    strInstructions?: string;
-    strArea?: string;
-    strCategory?: string;
-  };
+  meal: Meal;
 }
 
 const MealCard = ({ meal }: MealCardProps) => {
@@ -44,8 +35,13 @@ const MealCard = ({ meal }: MealCardProps) => {
         <div className="p-3 flex flex-col flex-grow">
           <div className="mb-1">
             {meal.strCategory && (
-              <span className="inline-block text-xs font-medium text-amber-700 uppercase tracking-wider">
+              <span className="inline-block text-xs font-medium text-emerald-700 uppercase tracking-wider">
                 {meal.strCategory}
+              </span>
+            )}
+            {meal.strArea && (
+              <span className="inline-block text-xs font-medium text-gray-500 uppercase tracking-wider ml-2">
+                {meal.strArea}
               </span>
             )}
           </div>
@@ -64,7 +60,7 @@ const MealCard = ({ meal }: MealCardProps) => {
           )}
           
           <div className="mt-auto">
-            <span className="inline-flex items-center text-amber-600 hover:text-amber-700 font-medium text-sm group-hover:underline transition-colors">
+            <span className="inline-flex items-center text-emerald-600 hover:text-emerald-700 font-medium text-sm group-hover:underline transition-colors">
               View recipe
               <svg 
                 xmlns="http://www.w3.org/2000/svg" 

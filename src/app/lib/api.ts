@@ -1,17 +1,5 @@
 import axios, { AxiosInstance, AxiosError } from "axios";
-
-// Define types for API responses
-interface Cocktail {
-  idDrink: string;
-  strDrink: string;
-  [key: string]: any;
-}
-
-interface Meal {
-  idMeal: string;
-  strMeal: string;
-  [key: string]: any;
-}
+import { Cocktail, Meal } from "@/types/recipe";
 
 interface CocktailResponse {
   drinks: Cocktail[];
@@ -21,10 +9,24 @@ interface MealResponse {
   meals: Meal[];
 }
 
+// API timeout constants
+const API_TIMEOUT = 10000; // 10 seconds
+
+/**
+ * Creates a promise that rejects after a specified timeout
+ */
+const timeout = (ms: number) => {
+  return new Promise((_, reject) => {
+    setTimeout(() => {
+      reject(new Error(`Request timed out after ${ms}ms`));
+    }, ms);
+  });
+};
+
 const createApiClient = (baseURL?: string): AxiosInstance => {
   const instance = axios.create({
     baseURL,
-    timeout: 5000, // Reduced timeout to 5 seconds
+    timeout: API_TIMEOUT,
     headers: {
       "Content-Type": "application/json",
       Accept: "application/json",
@@ -114,7 +116,7 @@ class ResponseCache {
   clear(): void {
     this.cache.clear();
   }
-};
+}
 
 const responseCache = new ResponseCache();
 
@@ -131,7 +133,13 @@ const cachedRequest = async <T extends CocktailResponse | MealResponse>(
   }
 
   try {
-    const response = await api.get<T>(url);
+    // Fix: Using await with proper type assertion for Promise.race
+    const response = await Promise.race([
+      api.get<T>(url),
+      timeout(API_TIMEOUT)
+    ]) as Awaited<ReturnType<typeof api.get<T>>>;
+    
+    // Now response is correctly typed as AxiosResponse<T>
     const data = response.data;
     responseCache.set(cacheKey, data);
     return data;
@@ -140,6 +148,7 @@ const cachedRequest = async <T extends CocktailResponse | MealResponse>(
       await new Promise((resolve) => setTimeout(resolve, 1000 * (3 - retries))); // Exponential backoff
       return cachedRequest(api, url, cacheKey, retries - 1);
     }
+    console.error(`Error in API request to ${url}:`, error);
     throw error;
   }
 };
@@ -181,7 +190,6 @@ const throttleRequests = <T>(
 };
 
 // Preconnect to API domains for better performance
-// And update the preconnectAPIs function to handle undefined cases
 export const preconnectAPIs = () => {
   if (typeof document !== "undefined") {
     const cocktailDomain = process.env.NEXT_PUBLIC_COCKTAILDB_API
@@ -208,82 +216,174 @@ export const preconnectAPIs = () => {
   }
 };
 
+/**
+ * Fetches a random cocktail from the API
+ */
+// const fetchRandomCocktail = async (): Promise<Cocktail | null> => {
+//   try {
+//     const cacheKey = `cocktail_random_${Math.floor(Date.now() / 60000)}`;
+//     const data = await cachedRequest<CocktailResponse>(
+//       cocktailApi,
+//       "/random.php",
+//       cacheKey
+//     );
+//     return data.drinks?.[0] || null;
+//   } catch (error) {
+//     console.error('Error fetching random cocktail:', error);
+//     throw error;
+//   }
+// };
+
+// /**
+//  * Fetches a random meal from the API
+//  */
+// const fetchRandomMeal = async (): Promise<Meal | null> => {
+//   try {
+//     const cacheKey = `meal_random_${Math.floor(Date.now() / 60000)}`;
+//     const data = await cachedRequest<MealResponse>(
+//       mealApi,
+//       "/random.php",
+//       cacheKey
+//     );
+//     return data.meals?.[0] || null;
+//   } catch (error) {
+//     console.error('Error fetching random meal:', error);
+//     throw error;
+//   }
+// };
+
+/**
+ * Fetches multiple random cocktails
+ */
 export const fetchRandomCocktails = async (count = 6): Promise<Cocktail[]> => {
-  const cacheKeys = Array.from(
-    { length: count },
-    (_, i) => `cocktail_random_${i}_${Math.floor(Date.now() / 60000)}`
-  ); // Minute-based cache key
+  try {
+    const cacheKeys = Array.from(
+      { length: count },
+      (_, i) => `cocktail_random_${i}_${Math.floor(Date.now() / 60000)}`
+    );
 
-  const promises = cacheKeys.map(
-    (cacheKey) => () =>
-      cachedRequest<CocktailResponse>(
-        cocktailApi,
-        "/random.php",
-        cacheKey
-      ).then((res) => res.drinks[0])
-  );
+    const promises = cacheKeys.map(
+      (cacheKey) => () =>
+        cachedRequest<CocktailResponse>(
+          cocktailApi,
+          "/random.php",
+          cacheKey
+        ).then((res) => res.drinks[0])
+    );
 
-  return throttleRequests(promises);
+    const results = await throttleRequests(promises);
+    return results.filter(Boolean) as Cocktail[];
+  } catch (error) {
+    console.error('Error fetching random cocktails:', error);
+    throw error;
+  }
 };
 
-export const fetchCocktailById = async (id: string): Promise<Cocktail> => {
-  const cacheKey = `cocktail_${id}`;
-  const data = await cachedRequest<CocktailResponse>(
-    cocktailApi,
-    `/lookup.php?i=${id}`,
-    cacheKey
-  );
-  return data.drinks[0];
-};
-
+/**
+ * Fetches multiple random meals
+ */
 export const fetchRandomMeals = async (count = 6): Promise<Meal[]> => {
-  const cacheKeys = Array.from(
-    { length: count },
-    (_, i) => `meal_random_${i}_${Math.floor(Date.now() / 60000)}`
-  ); // Minute-based cache key
+  try {
+    const cacheKeys = Array.from(
+      { length: count },
+      (_, i) => `meal_random_${i}_${Math.floor(Date.now() / 60000)}`
+    );
 
-  const promises = cacheKeys.map(
-    (cacheKey) => () =>
-      cachedRequest<MealResponse>(mealApi, "/random.php", cacheKey).then(
-        (res) => res.meals[0]
-      )
-  );
+    const promises = cacheKeys.map(
+      (cacheKey) => () =>
+        cachedRequest<MealResponse>(mealApi, "/random.php", cacheKey).then(
+          (res) => res.meals[0]
+        )
+    );
 
-  return throttleRequests(promises);
+    const results = await throttleRequests(promises);
+    return results.filter(Boolean) as Meal[];
+  } catch (error) {
+    console.error('Error fetching random meals:', error);
+    throw error;
+  }
 };
 
-export const fetchMealById = async (id: string): Promise<Meal> => {
-  const cacheKey = `meal_${id}`;
-  const data = await cachedRequest<MealResponse>(
-    mealApi,
-    `/lookup.php?i=${id}`,
-    cacheKey
-  );
-  return data.meals[0];
+/**
+ * Gets cocktail details by ID
+ */
+export const getCocktailById = async (id: string): Promise<Cocktail | null> => {
+  try {
+    const cacheKey = `cocktail_${id}`;
+    const data = await cachedRequest<CocktailResponse>(
+      cocktailApi,
+      `/lookup.php?i=${id}`,
+      cacheKey
+    );
+    return data.drinks?.[0] || null;
+  } catch (error) {
+    console.error(`Error fetching cocktail details for ID ${id}:`, error);
+    throw error;
+  }
 };
 
-export const searchCocktails = async (query: string): Promise<Cocktail[]> => {
-  const normalizedQuery = query.trim().toLowerCase();
-  if (!normalizedQuery) return [];
-
-  const cacheKey = `cocktail_search_${normalizedQuery}`;
-  const data = await cachedRequest<CocktailResponse>(
-    cocktailApi,
-    `/search.php?s=${encodeURIComponent(normalizedQuery)}`,
-    cacheKey
-  );
-  return data.drinks || [];
+/**
+ * Gets meal details by ID
+ */
+export const getMealById = async (id: string): Promise<Meal | null> => {
+  try {
+    const cacheKey = `meal_${id}`;
+    const data = await cachedRequest<MealResponse>(
+      mealApi,
+      `/lookup.php?i=${id}`,
+      cacheKey
+    );
+    return data.meals?.[0] || null;
+  } catch (error) {
+    console.error(`Error fetching meal details for ID ${id}:`, error);
+    throw error;
+  }
 };
 
-export const searchMeals = async (query: string): Promise<Meal[]> => {
-  const normalizedQuery = query.trim().toLowerCase();
-  if (!normalizedQuery) return [];
-
-  const cacheKey = `meal_search_${normalizedQuery}`;
-  const data = await cachedRequest<MealResponse>(
-    mealApi,
-    `/search.php?s=${encodeURIComponent(normalizedQuery)}`,
-    cacheKey
-  );
-  return data.meals || [];
+/**
+ * Searches for cocktails by name
+ */
+export const searchCocktailsByName = async (term: string): Promise<Cocktail[]> => {
+  try {
+    const normalizedQuery = term.trim().toLowerCase();
+    if (!normalizedQuery) return [];
+    
+    const cacheKey = `cocktail_search_${normalizedQuery}`;
+    const data = await cachedRequest<CocktailResponse>(
+      cocktailApi,
+      `/search.php?s=${encodeURIComponent(normalizedQuery)}`,
+      cacheKey
+    );
+    return data.drinks || [];
+  } catch (error) {
+    console.error('Error searching cocktails:', error);
+    throw error;
+  }
 };
+
+/**
+ * Searches for meals by name
+ */
+export const searchMealsByName = async (term: string): Promise<Meal[]> => {
+  try {
+    const normalizedQuery = term.trim().toLowerCase();
+    if (!normalizedQuery) return [];
+    
+    const cacheKey = `meal_search_${normalizedQuery}`;
+    const data = await cachedRequest<MealResponse>(
+      mealApi,
+      `/search.php?s=${encodeURIComponent(normalizedQuery)}`,
+      cacheKey
+    );
+    return data.meals || [];
+  } catch (error) {
+    console.error('Error searching meals:', error);
+    throw error;
+  }
+};
+
+// Aliases for backward compatibility
+export const fetchCocktailById = getCocktailById;
+export const fetchMealById = getMealById;
+export const searchCocktails = searchCocktailsByName;
+export const searchMeals = searchMealsByName;

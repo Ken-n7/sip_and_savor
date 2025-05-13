@@ -1,14 +1,9 @@
 import Image from 'next/image';
 import Link from 'next/link';
+import { Cocktail } from '@/types/recipe';
 
 interface CocktailCardProps {
-  cocktail: {
-    idDrink: string;
-    strDrink: string;
-    strDrinkThumb: string;
-    strInstructions?: string;
-    strCategory?: string;
-  };
+  cocktail: Cocktail;
 }
 
 const CocktailCard = ({ cocktail }: CocktailCardProps) => {

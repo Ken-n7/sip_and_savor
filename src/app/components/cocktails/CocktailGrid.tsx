@@ -1,8 +1,9 @@
 import { motion } from 'framer-motion';
+import { Cocktail } from '@/types/recipe';
 import CocktailCard from './CocktailCard';
 
 interface CocktailGridProps {
-  cocktails: any[];
+  cocktails: Cocktail[];
 }
 
 const CocktailGrid = ({ cocktails }: CocktailGridProps) => {

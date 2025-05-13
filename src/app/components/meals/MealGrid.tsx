@@ -1,18 +1,16 @@
-// src/components/meals/MealGrid.tsx
-'use client';
-
 import { motion } from 'framer-motion';
+import { Meal } from '@/types/recipe';
 import MealCard from './MealCard';
 
 interface MealGridProps {
-  meals: any[];
+  meals: Meal[];
 }
 
 const MealGrid = ({ meals }: MealGridProps) => {
-  // Remove duplicates by idDrink
+  // Remove duplicates by idMeal
   const uniqueMeals = meals.filter(
     (meal, index, self) =>
-      index === self.findIndex((c) => c.idMeal === meal.idMeal)
+      index === self.findIndex((m) => m.idMeal === meal.idMeal)
   );
 
   return (
