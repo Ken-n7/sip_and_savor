@@ -215,7 +215,7 @@ export const fetchRandomCocktails = async (count = 6): Promise<Cocktail[]> => {
   ); // Minute-based cache key
 
   const promises = cacheKeys.map(
-    (cacheKey, i) => () =>
+    (cacheKey) => () =>
       cachedRequest<CocktailResponse>(
         cocktailApi,
         "/random.php",
@@ -243,7 +243,7 @@ export const fetchRandomMeals = async (count = 6): Promise<Meal[]> => {
   ); // Minute-based cache key
 
   const promises = cacheKeys.map(
-    (cacheKey, i) => () =>
+    (cacheKey) => () =>
       cachedRequest<MealResponse>(mealApi, "/random.php", cacheKey).then(
         (res) => res.meals[0]
       )

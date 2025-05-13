@@ -33,9 +33,9 @@ export default function Home() {
       {loading ? (
         <div className="flex justify-center items-center h-64">
           <LoadingSpinner /> 
-{/* <LoadingSpinner size="h-8 w-8" /> // Custom size */}
+          {/* <LoadingSpinner size="h-8 w-8" /> // Custom size */}
         </div>
-      ) : error ? (
+      ) : error ? ( 
         <div className="flex justify-center">
           <ErrorMessage message={error} />
         </div>
@@ -71,7 +71,7 @@ export default function Home() {
 
           {/* CTA Section */}
           <section className="bg-accent/10 rounded-xl p-8 text-center mt-12">
-            <h3 className="text-2xl font-bold mb-4">Can't find what you're looking for?</h3>
+            <h3 className="text-2xl font-bold mb-4">Can&apos;t find what you&apos;re looking for?</h3>
             <p className="text-muted-foreground mb-6 max-w-2xl mx-auto">
               Try our advanced search or browse by categories to discover more recipes.
             </p>
