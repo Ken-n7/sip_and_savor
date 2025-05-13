@@ -3,7 +3,7 @@
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { Bars3Icon, XMarkIcon } from '@heroicons/react/24/outline';
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { ThemeToggle } from './ThemeToggle';
 
 const Header = () => {
@@ -11,23 +11,18 @@ const Header = () => {
   const [hasScrolled, setHasScrolled] = useState(false);
   const pathname = usePathname();
 
-  // Throttle scroll handler for performance
-  useEffect(() => {
-    let timeoutId: NodeJS.Timeout;
-    
-    const handleScroll = () => {
-      clearTimeout(timeoutId);
-      timeoutId = setTimeout(() => {
-        setHasScrolled(window.scrollY > 10);
-      }, 50);
-    };
+  // Memoized scroll handler with passive listener for better performance
+  const handleScroll = useCallback(() => {
+    setHasScrolled(window.scrollY > 10);
+  }, []);
 
-    window.addEventListener('scroll', handleScroll);
+  useEffect(() => {
+    // Using passive event listener for better scrolling performance
+    window.addEventListener('scroll', handleScroll, { passive: true });
     return () => {
-      clearTimeout(timeoutId);
       window.removeEventListener('scroll', handleScroll);
     };
-  }, []);
+  }, [handleScroll]);
 
   // Close menu when navigating
   useEffect(() => {
@@ -45,32 +40,37 @@ const Header = () => {
     <header
       className={`fixed w-full z-50 transition-all duration-200 ${
         hasScrolled 
-          ? 'bg-white/90 dark:bg-gray-900/90 backdrop-blur-sm border-b border-gray-100 dark:border-gray-800' 
+          ? 'bg-white/90 dark:bg-gray-900/90 backdrop-blur-sm border-b border-gray-100 dark:border-gray-800 shadow-sm' 
           : 'bg-white dark:bg-gray-900'
       }`}
       aria-label="Main navigation"
     >
-      <div className="container mx-auto px-4">
+      <div className="container mx-auto px-4 sm:px-6">
         <div className="flex items-center justify-between h-16">
-          {/* Logo - Simplified */}
+          {/* Logo with optimized contrast */}
           <Link 
             href="/" 
-            className="text-xl font-semibold text-gray-900 dark:text-white focus:outline-none focus-visible:ring-2 focus-visible:ring-primary rounded"
+            className="text-xl font-semibold text-gray-900 dark:text-gray-100 focus:outline-none focus-visible:ring-2 focus-visible:ring-primary-500 rounded transition-colors hover:text-primary-600 dark:hover:text-primary-400"
             aria-label="Home"
+            prefetch={false} // Disable prefetch for logo as it's likely above the fold
           >
             RecipeExplorer
           </Link>
 
-          {/* Desktop Navigation - More minimal */}
-          <nav className="hidden md:flex items-center space-x-6">
+          {/* Desktop Navigation - Optimized for performance */}
+          <nav 
+            className="hidden md:flex items-center space-x-6" 
+            aria-label="Desktop navigation"
+          >
             {navLinks.map((link) => (
               <Link
                 key={link.href}
                 href={link.href}
+                prefetch={false} // Disable prefetch for better performance
                 className={`text-sm px-1 py-2 transition-colors border-b-2 ${
                   pathname === link.href
-                    ? 'border-primary dark:border-primary-light text-gray-900 dark:text-white'
-                    : 'border-transparent hover:border-gray-200 dark:hover:border-gray-700 text-gray-600 hover:text-gray-900 dark:text-gray-400 dark:hover:text-white'
+                    ? 'border-primary-500 dark:border-primary-400 text-gray-900 dark:text-gray-100'
+                    : 'border-transparent hover:border-gray-200 dark:hover:border-gray-700 text-gray-600 hover:text-gray-900 dark:text-gray-400 dark:hover:text-gray-100'
                 }`}
                 aria-current={pathname === link.href ? 'page' : undefined}
               >
@@ -80,41 +80,46 @@ const Header = () => {
           </nav>
 
           {/* Right side items */}
-          <div className="flex items-center space-x-3">
-            <ThemeToggle />
+          <div className="flex items-center space-x-4">
+            <ThemeToggle aria-label="Toggle dark mode" />
             
-            {/* Mobile menu button - Improved accessibility */}
+            {/* Optimized mobile menu button */}
             <button
-              className="md:hidden p-2 rounded-md text-gray-600 hover:text-gray-900 dark:text-gray-400 dark:hover:text-white focus:outline-none focus-visible:ring-2 focus-visible:ring-primary"
+              className="md:hidden p-2 rounded-md text-gray-700 hover:text-gray-900 dark:text-gray-300 dark:hover:text-gray-100 focus:outline-none focus-visible:ring-2 focus-visible:ring-primary-500 transition-colors"
               onClick={() => setIsMenuOpen(!isMenuOpen)}
               aria-expanded={isMenuOpen}
               aria-label="Toggle menu"
+              aria-controls="mobile-menu"
             >
               {isMenuOpen ? (
-                <XMarkIcon className="h-5 w-5" />
+                <XMarkIcon className="h-6 w-6" aria-hidden="true" />
               ) : (
-                <Bars3Icon className="h-5 w-5" />
+                <Bars3Icon className="h-6 w-6" aria-hidden="true" />
               )}
             </button>
           </div>
         </div>
 
-        {/* Mobile Menu - Improved interaction */}
+        {/* Mobile Menu - Optimized for performance */}
         {isMenuOpen && (
           <div 
+            id="mobile-menu"
             className="md:hidden pb-4 transition-all duration-200 ease-out"
             role="dialog"
             aria-modal="true"
+            aria-labelledby="mobile-menu-label"
           >
-            <nav className="flex flex-col space-y-1">
+            <h2 id="mobile-menu-label" className="sr-only">Mobile menu</h2>
+            <nav className="flex flex-col space-y-2" aria-label="Mobile navigation">
               {navLinks.map((link) => (
                 <Link
                   key={link.href}
                   href={link.href}
-                  className={`px-3 py-2 rounded-md text-sm ${
+                  prefetch={false} // Disable prefetch for mobile links
+                  className={`px-3 py-2 rounded-md text-base ${
                     pathname === link.href
-                      ? 'bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-white'
-                      : 'text-gray-600 hover:bg-gray-100 dark:text-gray-400 dark:hover:bg-gray-800'
+                      ? 'bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-gray-100 font-medium'
+                      : 'text-gray-700 hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-gray-800'
                   }`}
                   aria-current={pathname === link.href ? 'page' : undefined}
                 >
