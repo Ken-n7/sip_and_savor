@@ -11,10 +11,6 @@ const inter = Inter({ subsets: ['latin'] });
 export const metadata: Metadata = {
   title: 'Food & Drink Explorer | Discover Recipes',
   description: 'Explore thousands of cocktail and meal recipes from around the world',
-  themeColor: [
-    { media: '(prefers-color-scheme: light)', color: '#f9fafb' },
-    { media: '(prefers-color-scheme: dark)', color: '#111827' },
-  ],
 };
 
 export default function RootLayout({

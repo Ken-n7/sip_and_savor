@@ -20,7 +20,7 @@
     --border: 217.2 32.6% 17.5%;
 }
 
-@theme inline {
+.inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
   --font-sans: var(--font-geist-sans);
