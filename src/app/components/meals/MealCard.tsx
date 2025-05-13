@@ -20,7 +20,9 @@ const MealCard = ({ meal }: MealCardProps) => {
       >
         <div className="relative aspect-[4/3] overflow-hidden bg-gray-100">
           <Image
-            src={meal.strMealThumb || '/placeholder-meal.jpg'}
+            // src={meal.strMealThumb || '/placeholder-meal.jpg'}
+            src={meal.strMealThumb ? `${meal.strMealThumb}/medium` : '/placeholder-meal.jpg'}
+
             alt={meal.strMeal}
             fill
             className="object-cover transition-transform duration-300 group-hover:scale-105"
