@@ -13,15 +13,15 @@ const CocktailCard = ({ cocktail }: CocktailCardProps) => {
       aria-labelledby={`cocktail-${cocktail.idDrink}-title`}
     >
       <Link 
-        href={`/cocktail/${cocktail.idDrink}`} 
+        href={`/cocktails/${cocktail.idDrink}`} 
         className="flex flex-col h-full"
         prefetch={false}
         aria-label={`View details for ${cocktail.strDrink}`}
       >
         <div className="relative aspect-[4/3] overflow-hidden bg-gray-100">
           <Image
-            src={cocktail.strDrinkThumb || '/placeholder-cocktail.jpg'}
-            // src={cocktail.strDrinkThumb ? `${cocktail.strDrinkThumb}/medium` : '/placeholder-cocktail.jpg'}
+            // src={cocktail.strDrinkThumb || '/placeholder-cocktail.jpg'}  
+            src={cocktail.strDrinkThumb ? `${cocktail.strDrinkThumb}/medium` : '/placeholder-cocktail.jpg'}
             alt={cocktail.strDrink}
             fill
             className="object-cover transition-transform duration-300 group-hover:scale-105"
@@ -33,7 +33,7 @@ const CocktailCard = ({ cocktail }: CocktailCardProps) => {
           />
         </div>
         
-        <div className="p-3 flex flex-col flex-grow">
+        <div className="p-3 flex flex-col flex-grow ">
           <div className="mb-1">
             {cocktail.strCategory && (
               <span className="inline-block text-xs font-medium text-amber-700 uppercase tracking-wider">
@@ -55,7 +55,7 @@ const CocktailCard = ({ cocktail }: CocktailCardProps) => {
             </p>
           )}
           
-          <div className="mt-auto">
+          {/* <div className="mt-auto">
             <span className="inline-flex items-center text-amber-600 hover:text-amber-700 font-medium text-sm group-hover:underline transition-colors">
               View recipe
               <svg 
@@ -69,7 +69,7 @@ const CocktailCard = ({ cocktail }: CocktailCardProps) => {
                 <path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" />
               </svg>
             </span>
-          </div>
+          </div> */}
         </div>
       </Link>
     </article>

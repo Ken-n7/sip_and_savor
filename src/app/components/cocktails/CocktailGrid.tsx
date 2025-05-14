@@ -14,7 +14,7 @@ const CocktailGrid = ({ cocktails }: CocktailGridProps) => {
   );
 
   return (
-    <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-3 gap-6">
+    <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
       {uniqueCocktails.map((cocktail, index) => (
         <motion.div
           key={cocktail.idDrink}

@@ -27,7 +27,7 @@ interface RecipeState {
   retryCount: number;
 }
 
-export const useRandomRecipes = (initialCount = 6): UseRandomRecipesResult => {
+export const useRandomRecipes = (initialCount = 4): UseRandomRecipesResult => {
   const [state, setState] = useState<RecipeState>({
     cocktails: [],
     meals: [],

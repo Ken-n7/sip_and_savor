@@ -13,15 +13,15 @@ const MealCard = ({ meal }: MealCardProps) => {
       aria-labelledby={`meal-${meal.idMeal}-title`}
     >
       <Link 
-        href={`/meal/${meal.idMeal}`} 
+        href={`/meals/${meal.idMeal}`} 
         className="flex flex-col h-full"
         prefetch={false}
         aria-label={`View details for ${meal.strMeal}`}
       >
         <div className="relative aspect-[4/3] overflow-hidden bg-gray-100">
           <Image
-            src={meal.strMealThumb || '/placeholder-meal.jpg'}
-            // src={meal.strMealThumb ? `${meal.strMealThumb}/medium` : '/placeholder-meal.jpg'}
+            // src={meal.strMealThumb || '/placeholder-meal.jpg'}
+            src={meal.strMealThumb ? `${meal.strMealThumb}/medium` : '/placeholder-meal.jpg'}
             alt={meal.strMeal}
             fill
             className="object-cover transition-transform duration-300 group-hover:scale-105"
@@ -59,22 +59,6 @@ const MealCard = ({ meal }: MealCardProps) => {
               {meal.strInstructions}
             </p>
           )}
-          
-          <div className="mt-auto">
-            <span className="inline-flex items-center text-emerald-600 hover:text-emerald-700 font-medium text-sm group-hover:underline transition-colors">
-              View recipe
-              <svg 
-                xmlns="http://www.w3.org/2000/svg" 
-                className="ml-1 h-3.5 w-3.5 transition-transform group-hover:translate-x-1"
-                fill="none" 
-                viewBox="0 0 24 24" 
-                stroke="currentColor"
-                strokeWidth={2}
-              >
-                <path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" />
-              </svg>
-            </span>
-          </div>
         </div>
       </Link>
     </article>
