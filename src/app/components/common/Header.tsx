@@ -72,7 +72,7 @@ export const Header = () => {
                   <div className="w-[50px] h-[50px]">
                     {resolvedTheme === 'dark' ? (
                       <Image
-                        src="/app-logo-light.webp"
+                        src="/app-logo-dark.webp"
                         alt="SipAndSavor Logo"
                         width={50}
                         height={50}
@@ -80,7 +80,7 @@ export const Header = () => {
                       />
                     ) : (
                       <Image
-                        src="/app-logo-dark.webp"
+                        src="/app-logo-light.webp"
                         alt="SipAndSavor Logo"
                         width={50}
                         height={50 }
