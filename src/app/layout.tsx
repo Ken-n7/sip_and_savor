@@ -8,9 +8,26 @@ import { ThemeProvider } from './components/common/ThemeProvider';
 
 const inter = Inter({ subsets: ['latin'] });
 
+// Determine API domains for preconnect
+const cocktailDomain = process.env.NEXT_PUBLIC_COCKTAILDB_API
+  ? new URL(process.env.NEXT_PUBLIC_COCKTAILDB_API).origin
+  : "https://www.thecocktaildb.com";
+
+const mealDomain = process.env.NEXT_PUBLIC_MEALDB_API
+  ? new URL(process.env.NEXT_PUBLIC_MEALDB_API).origin
+  : "https://www.themealdb.com";
+
 export const metadata: Metadata = {
   title: 'Food & Drink Explorer | Discover Recipes',
   description: 'Explore thousands of cocktail and meal recipes from around the world',
+  // Add preconnect links to improve performance
+  other: {
+    // Using the metadata API to add preconnect links
+    preconnect: [
+      cocktailDomain,
+      mealDomain
+    ]
+  }
 };
 
 export default function RootLayout({

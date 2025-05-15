@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback, useRef } from "react";
 import { Cocktail, Meal } from "@/types/recipe";
 import { 
   fetchRandomCocktails, 
@@ -35,6 +35,9 @@ export const useRandomRecipes = (initialCount = 4): UseRandomRecipesResult => {
     error: null,
     retryCount: 0,
   });
+  
+  // Add a ref to track if data has been fetched
+  const dataFetchedRef = useRef(false);
 
   const getErrorMessage = (error: unknown): string => {
     if (error instanceof Error) {
@@ -110,19 +113,13 @@ export const useRandomRecipes = (initialCount = 4): UseRandomRecipesResult => {
   }, []);
 
   useEffect(() => {
-    let mounted = true;
-
-    const loadData = async () => {
-      await fetchData(initialCount);
-    };
-
-    if (mounted) {
-      loadData();
+    // Only fetch data if it hasn't been fetched yet
+    if (!dataFetchedRef.current) {
+      dataFetchedRef.current = true;
+      fetchData(initialCount);
     }
-
-    return () => {
-      mounted = false;
-    };
+    
+    // Clean up function is not needed here since we're using the ref
   }, [fetchData, initialCount]);
 
   const refresh = useCallback(

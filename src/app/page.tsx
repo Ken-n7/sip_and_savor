@@ -1,9 +1,10 @@
 'use client'
 
+import { useState } from 'react';
 import { useRandomRecipes } from './hooks/useApi';
 import CocktailGrid from './components/cocktails/CocktailGrid';
 import MealGrid from './components/meals/MealGrid';
-import { SearchBar } from './components/common/SearchBar';
+import SearchBar from './components/search/SearchBar';
 import { LoadingSpinner } from './components/common/LoadingSpinner';
 import { ErrorMessage } from './components/common/ErrorMessage';
 import { Button } from './components/common/Button';
@@ -12,6 +13,16 @@ import { useRouter } from 'next/navigation';
 export default function Home() {
   const { cocktails, meals, loading, error } = useRandomRecipes();
   const router = useRouter();
+  const [query, setQuery] = useState('');
+
+  const handleSearch = (searchQuery: string) => {
+    setQuery(searchQuery);
+    
+    if (searchQuery.trim()) {
+      // Navigate to search results page with the query
+      router.push(`/search?q=${encodeURIComponent(searchQuery)}`);
+    }
+  };
 
   return (
     <main className="container mx-auto px-4 pt-24 max-w-7xl">
@@ -25,7 +36,13 @@ export default function Home() {
         </p>
         
         <div className="max-w-2xl mx-auto">
-          <SearchBar />
+          <SearchBar
+            onSearch={handleSearch}
+            placeholder="Search for cocktails or meals..."
+            initialValue={query}
+            autoFocus
+            className="mb-6"
+          />
         </div>
       </section>
 

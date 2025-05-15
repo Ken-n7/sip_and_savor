@@ -101,3 +101,30 @@ export interface Meal {
   strCreativeCommonsConfirmed?: string;
   dateModified?: string;
 }
+
+
+// Search result interface
+export interface SearchResult {
+  cocktails: Cocktail[];
+  meals: Meal[];
+  query: string;
+}
+
+// Helper types for recipe ingredients
+export interface RecipeIngredient {
+  name: string;
+  measure: string;
+}
+
+// Types for filtered search parameters
+export type FilterType = "all" | "cocktails" | "meals";
+
+export interface SearchFilters {
+  query: string;
+  filterType: FilterType;
+  category?: string;
+  ingredient?: string;
+  glass?: string; // For cocktails
+  alcoholic?: string; // For cocktails (alcoholic/non-alcoholic)
+  area?: string; // For meals
+}

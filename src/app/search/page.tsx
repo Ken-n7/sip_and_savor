@@ -1,63 +1,131 @@
-'use client'
+"use client";
 
-import { Suspense } from 'react'
-import { useSearchParams } from 'next/navigation'
-import { SearchBar } from '../components/common/SearchBar'
-import SearchResults from '../components/common/SearchResults'
-import {SearchTabs}  from '../components/common/SearchTabs'
-// import { SearchParams } from '../lib/types'
+import React, { useState, useEffect, useCallback } from "react";
+import { useRouter, useSearchParams } from "next/navigation";
+import { searchCocktailsByName, searchMealsByName } from "@/app/lib/api";
+import { Cocktail, Meal } from "@/types/recipe";
+import SearchBar from "@/app/components/search/SearchBar";
+import SearchResults from "@/app/components/search/SearchResults";
+import FilterBar from "@/app/components/search/FilterBar";
+import Head from "next/head";
 
-type currentCategory = 'drink' | 'meal' | 'all'
+export default function SearchPage() {
+  const router = useRouter();
+  const searchParams = useSearchParams();
 
-export interface SearchParams {
-  params:{
-    q?: string,
-    category: currentCategory
-  }
-}
+  // Get URL query params with fallbacks
+  const initialQuery = searchParams?.get("q") || "";
+  const initialFilter = (searchParams?.get("filter") as "all" | "cocktails" | "meals") || "all";
 
-export default function Page() {
-  const searchParams = useSearchParams()
-  const currentCategory = searchParams.get('category') || 'all'
-  const query = searchParams.get('q') || ''
+  // State for search results and UI
+  const [query, setQuery] = useState(initialQuery);
+  const [cocktails, setCocktails] = useState<Cocktail[]>([]);
+  const [meals, setMeals] = useState<Meal[]>([]);
+  const [isLoading, setIsLoading] = useState(false);
+  const [activeFilter, setActiveFilter] = useState<"all" | "cocktails" | "meals">(initialFilter);
+
+  // Format title with query if present
+  const pageTitle = query
+    ? `Search results for "${query}" | Recipe Explorer`
+    : "Search for recipes | Recipe Explorer";
+
+  // Update URL when query or filter changes
+  const updateUrl = useCallback((newQuery: string, newFilter: string) => {
+    const params = new URLSearchParams();
+    if (newQuery) params.set("q", newQuery);
+    if (newFilter !== "all") params.set("filter", newFilter);
+
+    const newUrl = `/search${params.toString() ? `?${params.toString()}` : ""}`;
+    router.replace(newUrl, { scroll: false });
+  }, [router]);
+
+  // Handle search action
+  const handleSearch = useCallback(async (searchTerm: string) => {
+    setQuery(searchTerm);
+    updateUrl(searchTerm, activeFilter);
+
+    if (!searchTerm.trim()) {
+      setCocktails([]);
+      setMeals([]);
+      return;
+    }
+
+    setIsLoading(true);
+
+    try {
+      // Fetch data based on active filter
+      const [newCocktails, newMeals] = await Promise.all([
+        activeFilter !== "meals" ? searchCocktailsByName(searchTerm) : Promise.resolve([]),
+        activeFilter !== "cocktails" ? searchMealsByName(searchTerm) : Promise.resolve([]),
+      ]);
+
+      setCocktails(newCocktails || []);
+      setMeals(newMeals || []);
+    } catch (error) {
+      console.error("Error searching recipes:", error);
+      // Could add error state handling here
+    } finally {
+      setIsLoading(false);
+    }
+  }, [activeFilter, updateUrl]);
+
+  // Handle filter changes
+  const handleFilterChange = useCallback((filter: "all" | "cocktails" | "meals") => {
+    setActiveFilter(filter);
+    updateUrl(query, filter);
+
+    // Re-run search with new filter if we have a query
+    if (query.trim()) {
+      handleSearch(query);
+    }
+  }, [query, updateUrl, handleSearch]);
+
+  // Run search on initial render if query provided
+  useEffect(() => {
+    if (initialQuery) {
+      handleSearch(initialQuery);
+    }
+  }, [initialQuery, handleSearch]);
 
   return (
-    <div className="container mx-auto px-4 py-8 pt-31">
-      <div className="max-w-3xl mx-auto mb-4">
-        <SearchBar 
-          initialValue={query}
-          className="w-full"
-        />
-      </div>
+    <>
+      <Head>
+        <title>{pageTitle}</title>
+        <meta name="description" content="Search for cocktails and meals recipes" />
+      </Head>
 
-      <SearchTabs currentCategory={currentCategory} query={query} />
-
-      <Suspense fallback={<SearchSkeleton />}>
-        <SearchResults searchParams={{ q: query, category: currentCategory as currentCategory}} />
-      </Suspense>
-    </div>
-  )
-}
-
-
-
-function SearchSkeleton() {
-  return (
-    <div className="space-y-6">
-      {[...Array(3)].map((_, i) => (
-        <div key={i} className="animate-pulse">
-          <div className="h-6 bg-gray-200 rounded w-1/3 mb-4"></div>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-            {[...Array(6)].map((_, j) => (
-              <div key={j} className="border rounded-lg p-4">
-                <div className="h-40 bg-gray-100 rounded mb-3"></div>
-                <div className="h-4 bg-gray-200 rounded w-3/4 mb-2"></div>
-                <div className="h-4 bg-gray-200 rounded w-1/2"></div>
-              </div>
-            ))}
-          </div>
+      <main
+        className="container max-w-6xl px-4 py-8 mx-auto"
+        style={{ backgroundColor: 'hsl(var(--background))' }}
+      >
+        <div className="max-w-2xl mx-auto mb-10">
+          <h1
+            className="mb-8 text-3xl font-bold text-center"
+            style={{ color: 'hsl(var(--foreground))' }}
+          >
+            Find Your Perfect Recipe
+          </h1>
+          <SearchBar
+            onSearch={handleSearch}
+            placeholder="Search for cocktails or meals..."
+            initialValue={query}
+            autoFocus
+            className="mb-6"
+          />
+          <FilterBar
+            activeFilter={activeFilter}
+            onFilterChange={handleFilterChange}
+          />
         </div>
-      ))}
-    </div>
-  )
+
+        <SearchResults
+          cocktails={cocktails}
+          meals={meals}
+          isLoading={isLoading}
+          query={query}
+          activeFilter={activeFilter}
+        />
+      </main>
+    </>
+  );
 }

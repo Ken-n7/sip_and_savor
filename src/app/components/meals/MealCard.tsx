@@ -9,18 +9,17 @@ interface MealCardProps {
 const MealCard = ({ meal }: MealCardProps) => {
   return (
     <article 
-      className="group bg-white rounded-lg shadow-sm hover:shadow-md transition-all duration-200 ease-in-out overflow-hidden border border-gray-200 flex flex-col h-full"
+      className="group bg-background rounded-lg shadow-sm hover:shadow-md transition-all duration-200 ease-in-out overflow-hidden border border-border flex flex-col h-full"
       aria-labelledby={`meal-${meal.idMeal}-title`}
     >
       <Link 
-        href={`/meals/${meal.idMeal}`} 
+        href={`/meal/${meal.idMeal}`} 
         className="flex flex-col h-full"
         prefetch={false}
         aria-label={`View details for ${meal.strMeal}`}
       >
-        <div className="relative aspect-[4/3] overflow-hidden bg-gray-100">
+        <div className="relative aspect-[4/3] overflow-hidden bg-muted">
           <Image
-            // src={meal.strMealThumb || '/placeholder-meal.jpg'}
             src={meal.strMealThumb ? `${meal.strMealThumb}/medium` : '/placeholder-meal.jpg'}
             alt={meal.strMeal}
             fill
@@ -36,12 +35,12 @@ const MealCard = ({ meal }: MealCardProps) => {
         <div className="p-3 flex flex-col flex-grow">
           <div className="mb-1">
             {meal.strCategory && (
-              <span className="inline-block text-xs font-medium text-emerald-700 uppercase tracking-wider">
+              <span className="inline-block text-xs font-medium text-primary uppercase tracking-wider">
                 {meal.strCategory}
               </span>
             )}
             {meal.strArea && (
-              <span className="inline-block text-xs font-medium text-gray-500 uppercase tracking-wider ml-2">
+              <span className="inline-block text-xs font-medium text-foreground/60 uppercase tracking-wider ml-2">
                 {meal.strArea}
               </span>
             )}
@@ -49,13 +48,13 @@ const MealCard = ({ meal }: MealCardProps) => {
           
           <h3 
             id={`meal-${meal.idMeal}-title`}
-            className="text-md font-semibold text-gray-800 line-clamp-1 mb-2"
+            className="text-md font-semibold text-foreground line-clamp-1 mb-2"
           >
             {meal.strMeal}
           </h3>
           
           {meal.strInstructions && (
-            <p className="text-gray-700 text-sm line-clamp-2 mb-3 flex-grow">
+            <p className="text-foreground/80 text-sm line-clamp-2 mb-3 flex-grow">
               {meal.strInstructions}
             </p>
           )}

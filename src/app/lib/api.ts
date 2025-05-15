@@ -217,45 +217,9 @@ export const preconnectAPIs = () => {
 };
 
 /**
- * Fetches a random cocktail from the API
- */
-// const fetchRandomCocktail = async (): Promise<Cocktail | null> => {
-//   try {
-//     const cacheKey = `cocktail_random_${Math.floor(Date.now() / 60000)}`;
-//     const data = await cachedRequest<CocktailResponse>(
-//       cocktailApi,
-//       "/random.php",
-//       cacheKey
-//     );
-//     return data.drinks?.[0] || null;
-//   } catch (error) {
-//     console.error('Error fetching random cocktail:', error);
-//     throw error;
-//   }
-// };
-
-// /**
-//  * Fetches a random meal from the API
-//  */
-// const fetchRandomMeal = async (): Promise<Meal | null> => {
-//   try {
-//     const cacheKey = `meal_random_${Math.floor(Date.now() / 60000)}`;
-//     const data = await cachedRequest<MealResponse>(
-//       mealApi,
-//       "/random.php",
-//       cacheKey
-//     );
-//     return data.meals?.[0] || null;
-//   } catch (error) {
-//     console.error('Error fetching random meal:', error);
-//     throw error;
-//   }
-// };
-
-/**
  * Fetches multiple random cocktails
  */
-export const fetchRandomCocktails = async (count = 6): Promise<Cocktail[]> => {
+export const fetchRandomCocktails = async (count = 0): Promise<Cocktail[]> => {
   try {
     const cacheKeys = Array.from(
       { length: count },
@@ -282,7 +246,7 @@ export const fetchRandomCocktails = async (count = 6): Promise<Cocktail[]> => {
 /**
  * Fetches multiple random meals
  */
-export const fetchRandomMeals = async (count = 6): Promise<Meal[]> => {
+export const fetchRandomMeals = async (count = 0): Promise<Meal[]> => {
   try {
     const cacheKeys = Array.from(
       { length: count },
