@@ -10,6 +10,8 @@ import { useTheme } from 'next-themes';
 
 const navLinks = [
   { name: 'Home', href: '/' },
+  { name: 'Cocktails', href: '/' },
+  { name: 'Meals', href: '/' },
 ];
 
 export const Header = () => {
