@@ -7,9 +7,9 @@ const footerLinks = [
   {
     title: 'Explore',
     links: [
-      { name: 'Cocktails', href: '/cocktails' },
-      { name: 'Meals', href: '/meals' },
-      { name: 'Categories', href: '/categories' },
+      // { name: 'Cocktails', href: '/cocktails' },
+      // { name: 'Meals', href: '/meals' },
+      // { name: 'Categories', href: '/categories' },
     ],
   },
   {
@@ -53,12 +53,12 @@ const Footer = () => {
             {footerLinks.map((column) => (
               <div key={column.title} className="space-y-3">
                 <h3 className="text-xs font-medium uppercase tracking-wider text-foreground/70">
-                  {column.title}
+                  {/* {column.title} */}
                 </h3>
                 <ul className="space-y-2">
                   {column.links.map((link) => (
                     <li key={link.name}>
-                      <Link
+                      {/* <Link
                         href={link.href}
                         className="text-sm text-foreground/70 hover:text-foreground transition-colors 
                                   focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary 
@@ -66,7 +66,7 @@ const Footer = () => {
                         prefetch={false}
                       >
                         {link.name}
-                      </Link>
+                      </Link> */}
                     </li>
                   ))}
                 </ul>
@@ -81,7 +81,7 @@ const Footer = () => {
             © {currentYear} SipAndSavor
           </p>
           <div className="flex space-x-4">
-            <Link
+            {/* <Link
               href="/terms"
               className="text-xs text-foreground/70 hover:text-foreground transition-colors 
                         focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary 
@@ -98,7 +98,7 @@ const Footer = () => {
               prefetch={false}
             >
               Privacy
-            </Link>
+            </Link> */}
           </div>
         </div>
       </div>

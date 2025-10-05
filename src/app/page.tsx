@@ -7,7 +7,7 @@ import MealGrid from './components/meals/MealGrid';
 import SearchBar from './components/search/SearchBar';
 import { LoadingSpinner } from './components/common/LoadingSpinner';
 import { ErrorMessage } from './components/common/ErrorMessage';
-import { Button } from './components/common/Button';
+// import { Button } from './components/common/Button';
 import { useRouter } from 'next/navigation';
 
 export default function Home() {
@@ -60,13 +60,13 @@ export default function Home() {
           <section className="mb-20">
             <div className="flex justify-between items-center mb-8">
               <h2 className="text-3xl font-bold">Featured Cocktails</h2>
-              <Button 
+              {/* <Button 
                 variant="outline" 
                 onClick={() => router.push('/cocktails')}
                 aria-label="View all cocktails"
               >
                 View All
-              </Button>
+              </Button> */}
             </div>
             <CocktailGrid cocktails={cocktails} />
           </section>
@@ -74,38 +74,38 @@ export default function Home() {
           <section className="mb-12">
             <div className="flex justify-between items-center mb-8">
               <h2 className="text-3xl font-bold">Featured Meals</h2>
-              <Button 
+              {/* <Button 
                 variant="outline" 
                 onClick={() => router.push('/meals')}
                 aria-label="View all meals"
               >
                 View All
-              </Button>
+              </Button> */}
             </div>
             <MealGrid meals={meals} />
           </section>
 
           {/* CTA Section */}
           <section className="bg-accent/10 rounded-xl p-8 text-center mt-12">
-            <h3 className="text-2xl font-bold mb-4">Can&apos;t find what you&apos;re looking for?</h3>
+            {/* <h3 className="text-2xl font-bold mb-4">Can&apos;t find what you&apos;re looking for?</h3>
             <p className="text-muted-foreground mb-6 max-w-2xl mx-auto">
               Try our advanced search or browse by categories to discover more recipes.
-            </p>
+            </p> */}
             <div className="flex gap-4 justify-center">
-              <Button 
+              {/* <Button 
                 variant="primary"
                 onClick={() => router.push('/search')}
                 aria-label="Advanced search"
               >
                 Advanced Search
-              </Button>
-              <Button 
+              </Button> */}
+              {/* <Button 
                 variant="secondary"
                 onClick={() => router.push('/categories')}
                 aria-label="Browse categories"
               >
                 Browse Categories
-              </Button>
+              </Button> */}
             </div>
           </section>
         </>
