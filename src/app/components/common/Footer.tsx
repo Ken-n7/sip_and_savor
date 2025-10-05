@@ -4,22 +4,22 @@ import Link from 'next/link';
 
 // Pre-defined footer links - moved outside component to avoid re-creation
 const footerLinks = [
-  {
-    title: 'Explore',
-    links: [
-      { name: 'Cocktails', href: '/cocktails' },
-      { name: 'Meals', href: '/meals' },
-      { name: 'Categories', href: '/categories' },
-    ],
-  },
-  {
-    title: 'Company',
-    links: [
-      { name: 'About', href: '/about' },
-      { name: 'Contact', href: '/contact' },
-      { name: 'Privacy', href: '/privacy' },
-    ],
-  },
+  // {
+  //   title: 'Explore',
+  //   links: [
+  //     { name: 'Cocktails', href: '/cocktails' },
+  //     { name: 'Meals', href: '/meals' },
+  //     { name: 'Categories', href: '/categories' },
+  //   ],
+  // },
+  // {
+  //   title: 'Company',
+  //   links: [
+  //     { name: 'About', href: '/about' },
+  //     { name: 'Contact', href: '/contact' },
+  //     { name: 'Privacy', href: '/privacy' },
+  //   ],
+  // },
 ];
 
 const Footer = () => {
