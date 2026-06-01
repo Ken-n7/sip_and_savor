@@ -57,7 +57,7 @@ export default function Home() {
         <>
           <section className="mb-12 md:mb-20">
             <div className="flex justify-between items-center mb-4 md:mb-8">
-              <h2 className="text-xl sm:text-2xl md:text-3xl font-bold">Today's Cocktails</h2>
+              <h2 className="text-xl sm:text-2xl md:text-3xl font-bold">Today&apos;s Cocktails</h2>
               <div className="flex items-center gap-2">
                 <button
                   onClick={() => refresh()}
@@ -82,7 +82,7 @@ export default function Home() {
 
           <section className="mb-10 md:mb-16">
             <div className="flex justify-between items-center mb-4 md:mb-8">
-              <h2 className="text-xl sm:text-2xl md:text-3xl font-bold">Today's Meals</h2>
+              <h2 className="text-xl sm:text-2xl md:text-3xl font-bold">Today&apos;s Meals</h2>
               <div className="flex items-center gap-2">
                 <button
                   onClick={() => refresh()}

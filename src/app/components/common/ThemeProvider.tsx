@@ -21,31 +21,6 @@ export function ThemeProvider({ children, ...props }: ThemeProviderProps) {
     }
   }, []);
 
-  // Apply CSS variables based on the selected color theme and current dark/light mode
-  useEffect(() => {
-    if (!mounted) return;
-    
-    const theme = THEMES[colorTheme];
-    
-    // Apply light theme variables
-    document.documentElement.style.setProperty('--primary-light', theme.light.primary);
-    document.documentElement.style.setProperty('--secondary-light', theme.light.secondary);
-    document.documentElement.style.setProperty('--accent-light', theme.light.accent);
-    document.documentElement.style.setProperty('--background-light', theme.light.background);
-    document.documentElement.style.setProperty('--text-light', theme.light.text);
-    
-    // Apply dark theme variables
-    document.documentElement.style.setProperty('--primary-dark', theme.dark.primary);
-    document.documentElement.style.setProperty('--secondary-dark', theme.dark.secondary);
-    document.documentElement.style.setProperty('--accent-dark', theme.dark.accent);
-    document.documentElement.style.setProperty('--background-dark', theme.dark.background);
-    document.documentElement.style.setProperty('--text-dark', theme.dark.text);
-    
-    // Update the actual CSS variables based on current mode
-    updateThemeVariables();
-    
-  }, [colorTheme, mounted]);
-  
   const updateThemeVariables = useCallback(() => {
     // Detect if currently in dark mode
     const isDarkMode = document.documentElement.classList.contains('dark');
@@ -63,9 +38,34 @@ export function ThemeProvider({ children, ...props }: ThemeProviderProps) {
       isDarkMode ? 'var(--text-dark)' : 'var(--text-light)');
   }, []);
 
+  // Apply CSS variables based on the selected color theme and current dark/light mode
   useEffect(() => {
     if (!mounted) return;
-    
+
+    const theme = THEMES[colorTheme];
+
+    // Apply light theme variables
+    document.documentElement.style.setProperty('--primary-light', theme.light.primary);
+    document.documentElement.style.setProperty('--secondary-light', theme.light.secondary);
+    document.documentElement.style.setProperty('--accent-light', theme.light.accent);
+    document.documentElement.style.setProperty('--background-light', theme.light.background);
+    document.documentElement.style.setProperty('--text-light', theme.light.text);
+
+    // Apply dark theme variables
+    document.documentElement.style.setProperty('--primary-dark', theme.dark.primary);
+    document.documentElement.style.setProperty('--secondary-dark', theme.dark.secondary);
+    document.documentElement.style.setProperty('--accent-dark', theme.dark.accent);
+    document.documentElement.style.setProperty('--background-dark', theme.dark.background);
+    document.documentElement.style.setProperty('--text-dark', theme.dark.text);
+
+    // Update the actual CSS variables based on current mode
+    updateThemeVariables();
+
+  }, [colorTheme, mounted, updateThemeVariables]);
+
+  useEffect(() => {
+    if (!mounted) return;
+
     // Create a MutationObserver to watch for class changes on the HTML element
     const observer = new MutationObserver((mutations) => {
       mutations.forEach((mutation) => {
