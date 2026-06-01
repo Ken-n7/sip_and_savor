@@ -1,23 +1,19 @@
-// app/search/loading.tsx
 export default function Loading() {
   return (
-    <div className="space-y-4">
-      {/* Search bar skeleton */}
-      <div className="h-12 bg-gray-100 rounded w-full max-w-3xl mx-auto"></div>
-      
-      {/* Tabs skeleton */}
-      <div className="flex justify-center gap-4">
-        {[...Array(3)].map((_, i) => (
-          <div key={i} className="h-10 bg-gray-100 rounded w-24"></div>
-        ))}
+    <div className="container max-w-6xl px-4 py-8 mx-auto space-y-6">
+      <div className="max-w-2xl mx-auto space-y-3">
+        <div className="h-10 bg-muted rounded-full w-full animate-pulse" />
+        <div className="flex gap-2">
+          {[...Array(3)].map((_, i) => (
+            <div key={i} className="h-8 bg-muted rounded-full w-20 animate-pulse" />
+          ))}
+        </div>
       </div>
-      
-      {/* Results skeleton */}
-      <div className="grid grid-cols-3 gap-4">
-        {[...Array(6)].map((_, i) => (
-          <div key={i} className="h-64 bg-gray-100 rounded"></div>
+      <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4">
+        {[...Array(10)].map((_, i) => (
+          <div key={i} className="aspect-[4/3] bg-muted rounded-lg animate-pulse" />
         ))}
       </div>
     </div>
-  )
+  );
 }

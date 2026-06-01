@@ -1,35 +1,23 @@
-// app/meals/[id]/loading.tsx
 export default function Loading() {
   return (
-    <div className="w-1/2 mx-auto py-8 space-y-8">
-      {/* Header skeleton */}
-      <div className="space-y-2">
-        <div className="h-8 bg-gray-100 rounded w-3/4 max-w-md"></div>
-        <div className="h-4 bg-gray-100 rounded w-1/2 max-w-xs"></div>
-      </div>
-      
-      {/* Image and ingredients skeleton */}
-      <div className="grid md:grid-cols-2 gap-8">
-        <div className="aspect-square bg-gray-100 rounded-lg"></div>
-        <div className="space-y-4">
-          <div className="h-6 bg-gray-100 rounded w-1/3"></div>
-          <div className="grid grid-cols-2 gap-2">
-            {[...Array(8)].map((_, i) => (
-              <div key={i} className="flex gap-2">
-                <div className="h-4 bg-gray-100 rounded w-1/4"></div>
-                <div className="h-4 bg-gray-100 rounded w-3/4"></div>
-              </div>
+    <div className="max-w-7xl mx-auto px-4 py-12 space-y-8">
+      <div className="h-8 bg-muted rounded w-40 animate-pulse" />
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+        <div className="lg:col-span-2 space-y-6">
+          <div className="h-12 bg-muted rounded w-3/4 animate-pulse" />
+          <div className="flex gap-3">
+            {[...Array(2)].map((_, i) => (
+              <div key={i} className="h-10 bg-muted rounded-full w-28 animate-pulse" />
             ))}
           </div>
+          <div className="aspect-square bg-muted rounded-2xl animate-pulse" />
         </div>
-      </div>
-      
-      {/* Instructions skeleton */}
-      <div className="space-y-2">
-        <div className="h-6 bg-gray-100 rounded w-1/4"></div>
-        {[...Array(5)].map((_, i) => (
-          <div key={i} className="h-4 bg-gray-100 rounded w-full"></div>
-        ))}
+        <div className="space-y-4">
+          <div className="h-8 bg-muted rounded w-32 animate-pulse" />
+          {[...Array(8)].map((_, i) => (
+            <div key={i} className="h-12 bg-muted rounded-lg animate-pulse" />
+          ))}
+        </div>
       </div>
     </div>
   );

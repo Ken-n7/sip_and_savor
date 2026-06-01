@@ -1,6 +1,7 @@
 import Image from 'next/image';
 import Link from 'next/link';
 import { Meal } from '@/types/recipe';
+import { FavoriteButton } from '@/app/components/common/FavoriteButton';
 
 interface MealCardProps {
   meal: Meal;
@@ -12,11 +13,10 @@ const MealCard = ({ meal }: MealCardProps) => {
       className="group bg-background rounded-lg shadow-sm hover:shadow-md transition-all duration-200 ease-in-out overflow-hidden border border-border flex flex-col h-full"
       aria-labelledby={`meal-${meal.idMeal}-title`}
     >
-      <Link 
-        href={`/meal/${meal.idMeal}`} 
+      <Link
+        href={`/meal/${meal.idMeal}`}
         className="flex flex-col h-full"
         prefetch={false}
-        aria-label={`View details for ${meal.strMeal}`}
       >
         <div className="relative aspect-[4/3] overflow-hidden bg-muted">
           <Image
@@ -30,6 +30,11 @@ const MealCard = ({ meal }: MealCardProps) => {
             placeholder="blur"
             blurDataURL="data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMzIwIiBoZWlnaHQ9IjMyMCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIiB2ZXJzaW9uPSIxLjEiLz4="
           />
+          <div className="absolute top-2 right-2">
+            <FavoriteButton
+              item={{ id: meal.idMeal, type: 'meal', name: meal.strMeal, thumb: meal.strMealThumb }}
+            />
+          </div>
         </div>
         
         <div className="p-3 flex flex-col flex-grow">
@@ -48,7 +53,7 @@ const MealCard = ({ meal }: MealCardProps) => {
           
           <h3 
             id={`meal-${meal.idMeal}-title`}
-            className="text-md font-semibold text-foreground line-clamp-1 mb-2"
+            className="text-base font-semibold text-foreground line-clamp-1 mb-2"
           >
             {meal.strMeal}
           </h3>

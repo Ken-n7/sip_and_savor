@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useCallback, useRef } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { Cocktail, Meal } from "@/types/recipe";
 import { 
   fetchRandomCocktails, 
@@ -36,9 +36,6 @@ export const useRandomRecipes = (initialCount = 4): UseRandomRecipesResult => {
     retryCount: 0,
   });
   
-  // Add a ref to track if data has been fetched
-  const dataFetchedRef = useRef(false);
-
   const getErrorMessage = (error: unknown): string => {
     if (error instanceof Error) {
       if (error.message.includes("Network error")) {
@@ -104,22 +101,12 @@ export const useRandomRecipes = (initialCount = 4): UseRandomRecipesResult => {
       }
     } catch (error) {
       console.error(`Error fetching ${type} with ID ${id}:`, error);
-      setState(prev => ({
-        ...prev,
-        error: getErrorMessage(error)
-      }));
       return null;
     }
   }, []);
 
   useEffect(() => {
-    // Only fetch data if it hasn't been fetched yet
-    if (!dataFetchedRef.current) {
-      dataFetchedRef.current = true;
-      fetchData(initialCount);
-    }
-    
-    // Clean up function is not needed here since we're using the ref
+    fetchData(initialCount);
   }, [fetchData, initialCount]);
 
   const refresh = useCallback(

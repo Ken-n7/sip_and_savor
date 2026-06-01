@@ -1,33 +1,34 @@
 @import "tailwindcss";
+@config "../../tailwind.config.ts";
 
 @layer base {
   :root {
-    /* Default theme variables - these will be dynamically updated */
     --primary: var(--primary-light);
-    --secondary: var(--secondary-light); 
+    --secondary: var(--secondary-light);
     --accent: var(--accent-light);
     --background: var(--background-light);
     --foreground: var(--text-light);
     --border: 214.3, 31.8%, 91.4%;
-    
-    /* Add this new variable for dropdown backgrounds */
-    --dropdown-bg-light: 0, 0%, 100%; /* Same as background-light but explicitly for dropdowns */
+    --primary-foreground: 0, 0%, 100%;
+    --muted: 210, 40%, 93%;
+    --muted-foreground: 215, 16%, 47%;
+    --destructive: 0, 72%, 51%;
+
+    --dropdown-bg-light: 0, 0%, 100%;
     --dropdown-bg: var(--dropdown-bg-light);
-    
-    /* Default theme variables (light) */
+
     --primary-light: 224, 76%, 48%;
-    --secondary-light: 142, 69%, 58%; 
+    --secondary-light: 142, 69%, 58%;
     --accent-light: 38, 92%, 50%;
     --background-light: 0, 0%, 100%;
     --text-light: 222, 47%, 11%;
-    
-    /* Default theme variables (dark) */
+
     --primary-dark: 213, 94%, 68%;
     --secondary-dark: 142, 71%, 45%;
     --accent-dark: 38, 95%, 64%;
     --background-dark: 222, 47%, 11%;
     --text-dark: 213, 31%, 91%;
-    --dropdown-bg-dark: 222, 47%, 11%; /* Same as background-dark but explicitly for dropdowns */
+    --dropdown-bg-dark: 222, 47%, 11%;
   }
 
   .dark {
@@ -38,7 +39,16 @@
     --foreground: var(--text-dark);
     --border: 217.2, 32.6%, 17.5%;
     --dropdown-bg: var(--dropdown-bg-dark);
+    --primary-foreground: 222, 47%, 11%;
+    --muted: 217, 32%, 20%;
+    --muted-foreground: 215, 20%, 65%;
+    --destructive: 0, 62%, 60%;
   }
+}
+
+/* Manual overrides for classes that need guaranteed specificity */
+.text-primary-foreground {
+  color: hsl(var(--primary-foreground));
 }
 
 .solid-bg {
@@ -46,15 +56,33 @@
   backdrop-filter: none;
 }
 
+html {
+  scrollbar-gutter: stable;
+}
+
 body {
   background-color: hsl(var(--background));
   color: hsl(var(--foreground));
 }
 
+/* Animation keyframes — defined here so they always work regardless of config loading */
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+@keyframes slideUp {
+  from { transform: translateY(20px); opacity: 0; }
+  to { transform: translateY(0); opacity: 1; }
+}
+@keyframes shimmer {
+  from { transform: translateX(-100%); }
+  to { transform: translateX(100%); }
+}
 @keyframes slide-down {
   from { opacity: 0; transform: translateY(-10px); }
   to { opacity: 1; transform: translateY(0); }
 }
-.animate-slide-down {
-  animation: slide-down 0.3s ease-out;
-}
+
+.animate-fade-in { animation: fadeIn 0.5s ease-out; }
+.animate-slide-up { animation: slideUp 0.5s ease-out; }
+.animate-slide-down { animation: slide-down 0.3s ease-out; }

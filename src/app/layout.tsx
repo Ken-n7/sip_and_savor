@@ -18,16 +18,8 @@ const mealDomain = process.env.NEXT_PUBLIC_MEALDB_API
   : "https://www.themealdb.com";
 
 export const metadata: Metadata = {
-  title: 'Food & Drink Explorer | Discover Recipes',
+  title: 'SipAndSavor | Discover Recipes',
   description: 'Explore thousands of cocktail and meal recipes from around the world',
-  // Add preconnect links to improve performance
-  other: {
-    // Using the metadata API to add preconnect links
-    preconnect: [
-      cocktailDomain,
-      mealDomain
-    ]
-  }
 };
 
 export default function RootLayout({
@@ -37,7 +29,11 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en" suppressHydrationWarning>
-      <body className={`${inter.className}`}>
+      <head>
+        <link rel="preconnect" href={cocktailDomain} />
+        <link rel="preconnect" href={mealDomain} />
+      </head>
+      <body className={inter.className}>
         <ThemeProvider
           attribute="class"
           defaultTheme="system"

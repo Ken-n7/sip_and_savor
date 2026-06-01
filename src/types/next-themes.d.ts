@@ -1,4 +1,4 @@
-import type { ThemeProviderProps } from 'next-themes/dist/types';
+import type { ThemeProviderProps } from 'next-themes';
 
 declare module 'next-themes' {
   export { ThemeProviderProps };

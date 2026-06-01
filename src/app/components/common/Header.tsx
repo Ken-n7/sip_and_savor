@@ -3,10 +3,13 @@
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import Image from 'next/image';
-import { Bars3Icon, XMarkIcon } from '@heroicons/react/24/outline';
+import { Bars3Icon, XMarkIcon, MagnifyingGlassIcon, SwatchIcon } from '@heroicons/react/24/outline';
 import { useState, useEffect, useCallback } from 'react';
 import { ThemeToggle } from './ThemeToggle';
 import { useTheme } from 'next-themes';
+import { useColorTheme } from './ThemeProvider';
+import { THEMES, ThemeKey } from '../../lib/theme';
+import { SearchModal } from '../search/SearchModal';
 
 const navLinks = [
   { name: 'Home', href: '/' },
@@ -18,11 +21,15 @@ export const Header = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [hasScrolled, setHasScrolled] = useState(false);
   const [mounted, setMounted] = useState(false);
+  const [isSearchOpen, setIsSearchOpen] = useState(false);
+  const [isMac, setIsMac] = useState(false);
   const { resolvedTheme } = useTheme();
+  const { colorTheme, setColorTheme } = useColorTheme();
   const pathname = usePathname();
 
   useEffect(() => {
     setMounted(true);
+    setIsMac(/Mac|iPhone|iPad|iPod/i.test(navigator.platform));
   }, []);
 
   const handleScroll = useCallback(() => {
@@ -50,6 +57,17 @@ export const Header = () => {
   useEffect(() => {
     setIsMenuOpen(false);
   }, [pathname]);
+
+  useEffect(() => {
+    const handler = (e: KeyboardEvent) => {
+      if ((e.metaKey || e.ctrlKey) && e.key === 'k') {
+        e.preventDefault();
+        setIsSearchOpen(true);
+      }
+    };
+    document.addEventListener('keydown', handler);
+    return () => document.removeEventListener('keydown', handler);
+  }, []);
 
   return (
     <>
@@ -85,26 +103,19 @@ export const Header = () => {
                         src="/app-logo-light.webp"
                         alt="SipAndSavor Logo"
                         width={50}
-                        height={50 }
+                        height={50}
                         className="w-full h-full"
                       />
                     )}
                   </div>
-                  <span 
-                    className="text-foreground"
-                    style={{
-                      color: resolvedTheme === 'dark' 
-                        ? 'var(--text-dark)' 
-                        : 'var(--text-light)'
-                    }}
-                  >
+                  <span className="text-foreground">
                     SipAndSavor
                   </span>
                 </>
               ) : (
                 <>
-                  <div className="w-[50px] h-[50px] bg-gray-200 dark:bg-gray-700 rounded animate-pulse" />
-                  <span className="w-24 h-6 bg-gray-200 dark:bg-gray-700 rounded animate-pulse" />
+                  <div className="w-[50px] h-[50px] bg-muted rounded animate-pulse" />
+                  <span className="inline-block w-24 h-6 bg-muted rounded animate-pulse" />
                 </>
               )}
             </Link>
@@ -115,7 +126,7 @@ export const Header = () => {
                 <Link
                   key={link.href}
                   href={link.href}
-                  className={`text-sm px-1 py-2 transition-colors border-b-2 ${
+                  className={`text-sm px-1 py-3 transition-colors border-b-2 ${
                     pathname === link.href
                       ? 'border-primary text-foreground'
                       : 'border-transparent hover:border-border text-foreground/70 hover:text-foreground'
@@ -127,10 +138,21 @@ export const Header = () => {
             </nav>
 
             {/* Right-side items */}
-            <div className="flex items-center space-x-4">
+            <div className="flex items-center space-x-1 sm:space-x-4">
+              <button
+                onClick={() => setIsSearchOpen(true)}
+                className="flex items-center gap-2 px-3 min-h-[44px] text-sm text-foreground/60 hover:text-foreground border border-border rounded-full hover:bg-accent/10 transition-colors"
+                aria-label="Search"
+              >
+                <MagnifyingGlassIcon className="w-4 h-4" />
+                <span className="hidden sm:inline">Search</span>
+                <kbd className="hidden md:inline-flex items-center gap-1 text-xs text-foreground/40">
+                  <span>{isMac ? '⌘K' : 'Ctrl+K'}</span>
+                </kbd>
+              </button>
               <ThemeToggle />
               <button
-                className="md:hidden p-2 rounded-md text-foreground/70 hover:text-foreground focus:outline-none"
+                className="md:hidden p-[10px] rounded-md text-foreground/70 hover:text-foreground focus:outline-none"
                 onClick={() => setIsMenuOpen(!isMenuOpen)}
                 aria-label="Toggle menu"
                 aria-expanded={isMenuOpen}
@@ -147,12 +169,12 @@ export const Header = () => {
           {/* Mobile Menu */}
           {isMenuOpen && (
             <div className="md:hidden pb-4">
-              <nav className="flex flex-col space-y-2">
+              <nav className="flex flex-col space-y-1">
                 {navLinks.map((link) => (
                   <Link
                     key={link.href}
                     href={link.href}
-                    className={`px-3 py-2 rounded-md text-base ${
+                    className={`px-3 py-3 rounded-md text-base ${
                       pathname === link.href
                         ? 'bg-accent/10 text-foreground font-medium'
                         : 'text-foreground/70 hover:bg-accent/10 hover:text-foreground'
@@ -162,10 +184,41 @@ export const Header = () => {
                   </Link>
                 ))}
               </nav>
+
+              {/* Color theme picker — only visible on mobile since swatch is hidden in header */}
+              <div className="mt-4 pt-4 border-t border-border">
+                <p className="px-3 mb-2 text-xs font-medium uppercase tracking-wider text-foreground/50">
+                  Color Theme
+                </p>
+                <div className="flex flex-wrap gap-2 px-3">
+                  {Object.entries(THEMES).map(([key, themeConfig]) => (
+                    <button
+                      key={key}
+                      onClick={() => setColorTheme(key as ThemeKey)}
+                      className={`flex items-center gap-1.5 px-3 py-2 rounded-full text-sm transition-colors ${
+                        colorTheme === key
+                          ? 'bg-primary/10 text-primary font-medium'
+                          : 'text-foreground/60 hover:bg-accent/10 hover:text-foreground'
+                      }`}
+                    >
+                      <span
+                        className="w-3 h-3 rounded-full shrink-0"
+                        style={{
+                          backgroundColor: `hsl(${resolvedTheme === 'dark'
+                            ? themeConfig.dark.primary
+                            : themeConfig.light.primary})`,
+                        }}
+                      />
+                      {themeConfig.name}
+                    </button>
+                  ))}
+                </div>
+              </div>
             </div>
           )}
         </div>
       </header>
+      <SearchModal isOpen={isSearchOpen} onClose={() => setIsSearchOpen(false)} />
     </>
   );
 };

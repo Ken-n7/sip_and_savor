@@ -19,134 +19,93 @@ const SearchResults: React.FC<SearchResultsProps> = ({
   query,
   activeFilter,
 }) => {
-  const hasResults = cocktails.length > 0 || meals.length > 0;
   const hasQuery = query.trim().length > 0;
+
+  const visibleCocktails = activeFilter !== "meals" ? cocktails : [];
+  const visibleMeals = activeFilter !== "cocktails" ? meals : [];
+  const totalCount = visibleCocktails.length + visibleMeals.length;
 
   if (isLoading) {
     return (
-      <div className="flex flex-col items-center justify-center py-12">
-        <div 
-          className="w-12 h-12 border-4 rounded-full animate-spin"
-          style={{
-            borderColor: 'hsl(var(--border))',
-            borderTopColor: 'hsl(var(--primary))'
-          }}
-        ></div>
-        <p className="mt-4" style={{ color: 'hsl(var(--foreground) / 0.7)' }}>
-          Searching for recipes...
-        </p>
+      <div className="flex flex-col items-center justify-center py-16">
+        <div className="w-10 h-10 border-4 border-border border-t-primary rounded-full animate-spin" />
+        <p className="mt-4 text-sm text-foreground/60">Searching for recipes...</p>
       </div>
     );
   }
 
   if (!hasQuery) {
     return (
-      <div className="flex flex-col items-center justify-center py-12 text-center">
-        <p style={{ color: 'hsl(var(--foreground) / 0.7)' }}>
-          Start typing to search for cocktails and meals
-        </p>
+      <div className="flex flex-col items-center justify-center py-16 text-center">
+        <p className="text-foreground/50">Start typing to search for cocktails and meals</p>
       </div>
     );
   }
 
-  if (hasQuery && !hasResults) {
+  if (hasQuery && totalCount === 0) {
     return (
-      <div className="flex flex-col items-center justify-center py-12 text-center">
-        <h3 
-          className="text-xl font-medium"
-          style={{ color: 'hsl(var(--foreground))' }}
-        >
-          No results found
-        </h3>
-        <p className="mt-2" style={{ color: 'hsl(var(--foreground) / 0.7)' }}>
-          We couldn&apos;t find any recipes matching &quot;{query}&quot;.
+      <div className="flex flex-col items-center justify-center py-16 text-center">
+        <h3 className="text-xl font-medium text-foreground">No results found</h3>
+        <p className="mt-2 text-foreground/60">
+          No recipes matching &quot;{query}&quot;
         </p>
-        <p className="mt-4" style={{ color: 'hsl(var(--foreground) / 0.6)' }}>
-          Try using different keywords or check for typos.
-        </p>
+        <p className="mt-1 text-sm text-foreground/40">Try different keywords or check for typos.</p>
       </div>
     );
   }
 
-  const shouldShowCocktails = activeFilter !== "meals" && cocktails.length > 0;
-  const shouldShowMeals = activeFilter !== "cocktails" && meals.length > 0;
+  // Interleave cocktails and meals for the mixed grid
+  const mixed: Array<{ type: "cocktail"; item: Cocktail } | { type: "meal"; item: Meal }> = [];
+  const maxLen = Math.max(visibleCocktails.length, visibleMeals.length);
+  for (let i = 0; i < maxLen; i++) {
+    if (visibleCocktails[i]) mixed.push({ type: "cocktail", item: visibleCocktails[i] });
+    if (visibleMeals[i]) mixed.push({ type: "meal", item: visibleMeals[i] });
+  }
 
   return (
-    <div className="space-y-8">
-      <AnimatePresence mode="wait">
-        {shouldShowCocktails && (
-          <motion.section
-            key="cocktails"
-            initial={{ opacity: 0, y: 10 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: -10 }}
-            transition={{ duration: 0.2 }}
-          >
-            <h2 
-              className="mb-4 text-2xl font-bold"
-              style={{ color: 'hsl(var(--foreground))' }}
-            >
-              Cocktails
-              <span 
-                className="ml-2 text-sm font-normal"
-                style={{ color: 'hsl(var(--foreground) / 0.6)' }}
-              >
-                ({cocktails.length})
-              </span>
-            </h2>
-            <motion.div 
-              className="grid grid-cols-1 gap-4 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4"
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              transition={{ delay: 0.1 }}
-            >
-              {cocktails.map((cocktail) => (
-                <CocktailCard 
-                  key={cocktail.idDrink}
-                  cocktail={cocktail}
-                />
-              ))}
-            </motion.div>
-          </motion.section>
+    <div>
+      <div className="flex items-center justify-between mb-6">
+        <p className="text-sm text-foreground/50">
+          {totalCount} result{totalCount !== 1 ? "s" : ""} for &quot;{query}&quot;
+        </p>
+        {activeFilter === "all" && visibleCocktails.length > 0 && visibleMeals.length > 0 && (
+          <p className="text-xs text-foreground/40">
+            {visibleCocktails.length} cocktail{visibleCocktails.length !== 1 ? "s" : ""} · {visibleMeals.length} meal{visibleMeals.length !== 1 ? "s" : ""}
+          </p>
         )}
-      </AnimatePresence>
+      </div>
 
       <AnimatePresence mode="wait">
-        {shouldShowMeals && (
-          <motion.section
-            key="meals"
-            initial={{ opacity: 0, y: 10 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: -10 }}
-            transition={{ duration: 0.2 }}
-          >
-            <h2 
-              className="mb-4 text-2xl font-bold"
-              style={{ color: 'hsl(var(--foreground))' }}
-            >
-              Meals
-              <span 
-                className="ml-2 text-sm font-normal"
-                style={{ color: 'hsl(var(--foreground) / 0.6)' }}
+        <motion.div
+          key={`${query}-${activeFilter}`}
+          initial={{ opacity: 0, y: 8 }}
+          animate={{ opacity: 1, y: 0 }}
+          exit={{ opacity: 0 }}
+          transition={{ duration: 0.2 }}
+          className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 xl:grid-cols-5 gap-3 sm:gap-4"
+        >
+          {mixed.map((entry, i) =>
+            entry.type === "cocktail" ? (
+              <motion.div
+                key={`cocktail-${entry.item.idDrink}`}
+                initial={{ opacity: 0, y: 12 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: i * 0.04 }}
               >
-                ({meals.length})
-              </span>
-            </h2>
-            <motion.div 
-              className="grid grid-cols-1 gap-4 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4"
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              transition={{ delay: 0.1 }}
-            >
-              {meals.map((meal) => (
-                <MealCard
-                  key={meal.idMeal}
-                  meal={meal}
-                />
-              ))}
-            </motion.div>
-          </motion.section>
-        )}
+                <CocktailCard cocktail={entry.item} />
+              </motion.div>
+            ) : (
+              <motion.div
+                key={`meal-${entry.item.idMeal}`}
+                initial={{ opacity: 0, y: 12 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: i * 0.04 }}
+              >
+                <MealCard meal={entry.item} />
+              </motion.div>
+            )
+          )}
+        </motion.div>
       </AnimatePresence>
     </div>
   );

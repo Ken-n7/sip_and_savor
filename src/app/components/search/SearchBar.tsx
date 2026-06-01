@@ -17,7 +17,6 @@ const SearchBar: React.FC<SearchBarProps> = ({
   autoFocus = false,
 }) => {
   const [searchTerm, setSearchTerm] = useState(initialValue);
-  const [isFocused, setIsFocused] = useState(false);
   const inputRef = useRef<HTMLInputElement>(null);
   const debounceTimeout = useRef<ReturnType<typeof setTimeout> | null>(null);
 
@@ -28,19 +27,20 @@ const SearchBar: React.FC<SearchBarProps> = ({
   }, [autoFocus]);
 
   useEffect(() => {
-    // Update search term if initialValue changes externally
     setSearchTerm(initialValue);
   }, [initialValue]);
+
+  useEffect(() => {
+    return () => {
+      if (debounceTimeout.current) clearTimeout(debounceTimeout.current);
+    };
+  }, []);
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const value = e.target.value;
     setSearchTerm(value);
 
-    // Debounce search for better performance
-    if (debounceTimeout.current) {
-      clearTimeout(debounceTimeout.current);
-    }
-
+    if (debounceTimeout.current) clearTimeout(debounceTimeout.current);
     debounceTimeout.current = setTimeout(() => {
       onSearch(value);
     }, 300);
@@ -48,20 +48,20 @@ const SearchBar: React.FC<SearchBarProps> = ({
 
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
+    if (debounceTimeout.current) clearTimeout(debounceTimeout.current);
     onSearch(searchTerm);
   };
 
   const clearSearch = () => {
     setSearchTerm("");
     onSearch("");
-    if (inputRef.current) {
-      inputRef.current.focus();
-    }
+    inputRef.current?.focus();
   };
 
   return (
-    <form 
-      onSubmit={handleSubmit} 
+    <form
+      onSubmit={handleSubmit}
+      role="search"
       className={`relative flex items-center w-full ${className}`}
     >
       <input
@@ -69,25 +69,23 @@ const SearchBar: React.FC<SearchBarProps> = ({
         type="text"
         value={searchTerm}
         onChange={handleInputChange}
-        onFocus={() => setIsFocused(true)}
-        onBlur={() => setIsFocused(isFocused)}
         placeholder={placeholder}
-        className="w-full px-4 py-2 pl-10 pr-10 text-base transition-all border rounded-full outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 border-gray-300 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-100"
+        className="w-full px-4 py-2.5 pl-10 pr-10 text-base transition-all border rounded-full outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary focus:ring-offset-background border-border bg-background text-foreground placeholder:text-foreground/40"
         aria-label="Search"
       />
-      
+
       <div className="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
-        <MagnifyingGlassIcon className="w-5 h-5 text-gray-400" />
+        <MagnifyingGlassIcon className="w-5 h-5 text-foreground/40" />
       </div>
 
       {searchTerm && (
         <button
           type="button"
           onClick={clearSearch}
-          className="absolute inset-y-0 right-0 flex items-center pr-3"
+          className="absolute inset-y-0 right-0 flex items-center px-3 min-w-[44px] justify-center"
           aria-label="Clear search"
         >
-          <XMarkIcon className="w-5 h-5 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300" />
+          <XMarkIcon className="w-5 h-5 text-foreground/40 hover:text-foreground/70 transition-colors" />
         </button>
       )}
     </form>

@@ -1,4 +1,3 @@
-// app/api/search/suggestions/route.ts
 import { searchCocktailsByName, searchMealsByName } from '../../lib/api';
 import { Cocktail, Meal } from '@/types/recipe';
 import { NextRequest, NextResponse } from 'next/server';

@@ -10,18 +10,7 @@ interface MealResponse {
 }
 
 // API timeout constants
-const API_TIMEOUT = 10000; // 10 seconds
-
-/**
- * Creates a promise that rejects after a specified timeout
- */
-const timeout = (ms: number) => {
-  return new Promise((_, reject) => {
-    setTimeout(() => {
-      reject(new Error(`Request timed out after ${ms}ms`));
-    }, ms);
-  });
-};
+const API_TIMEOUT = 20000; // 20 seconds — free-tier APIs can be slow
 
 const createApiClient = (baseURL?: string): AxiosInstance => {
   const instance = axios.create({
@@ -60,7 +49,6 @@ const createApiClient = (baseURL?: string): AxiosInstance => {
   return instance;
 };
 
-// Update the createApiClient calls with proper type checking
 const cocktailApi = createApiClient(
   process.env.NEXT_PUBLIC_COCKTAILDB_API ??
     "https://www.thecocktaildb.com/api/json/v1/1"
@@ -133,19 +121,13 @@ const cachedRequest = async <T extends CocktailResponse | MealResponse>(
   }
 
   try {
-    // Fix: Using await with proper type assertion for Promise.race
-    const response = await Promise.race([
-      api.get<T>(url),
-      timeout(API_TIMEOUT)
-    ]) as Awaited<ReturnType<typeof api.get<T>>>;
-    
-    // Now response is correctly typed as AxiosResponse<T>
+    const response = await api.get<T>(url);
     const data = response.data;
     responseCache.set(cacheKey, data);
     return data;
   } catch (error) {
     if (retries > 0) {
-      await new Promise((resolve) => setTimeout(resolve, 1000 * (3 - retries))); // Exponential backoff
+      await new Promise((resolve) => setTimeout(resolve, 1000 * (3 - retries)));
       return cachedRequest(api, url, cacheKey, retries - 1);
     }
     console.error(`Error in API request to ${url}:`, error);
@@ -153,68 +135,36 @@ const cachedRequest = async <T extends CocktailResponse | MealResponse>(
   }
 };
 
-// Throttle function with improved concurrency control
 const throttleRequests = <T>(
   promises: (() => Promise<T>)[],
   maxConcurrent = 3
 ): Promise<T[]> => {
-  const results: T[] = [];
-  let currentIndex = 0;
-  let activePromises = 0;
-
   return new Promise((resolve, reject) => {
-    const runNext = async () => {
-      if (currentIndex >= promises.length && activePromises === 0) {
-        resolve(results);
-        return;
-      }
+    const results: T[] = new Array(promises.length);
+    let nextIndex = 0;
+    let completed = 0;
 
-      while (activePromises < maxConcurrent && currentIndex < promises.length) {
-        activePromises++;
-        const promiseIndex = currentIndex++;
-        try {
-          const result = await promises[promiseIndex]();
-          results[promiseIndex] = result;
-        } catch (error) {
-          reject(error);
-          return;
-        } finally {
-          activePromises--;
-          runNext();
-        }
-      }
+    const runOne = (index: number) => {
+      promises[index]()
+        .then((result) => {
+          results[index] = result;
+          completed++;
+          if (completed === promises.length) {
+            resolve(results);
+          } else if (nextIndex < promises.length) {
+            runOne(nextIndex++);
+          }
+        })
+        .catch(reject);
     };
 
-    runNext();
+    const initial = Math.min(maxConcurrent, promises.length);
+    for (let i = 0; i < initial; i++) {
+      runOne(nextIndex++);
+    }
   });
 };
 
-// Preconnect to API domains for better performance
-export const preconnectAPIs = () => {
-  if (typeof document !== "undefined") {
-    const cocktailDomain = process.env.NEXT_PUBLIC_COCKTAILDB_API
-      ? new URL(process.env.NEXT_PUBLIC_COCKTAILDB_API).origin
-      : "https://www.thecocktaildb.com";
-
-    const mealDomain = process.env.NEXT_PUBLIC_MEALDB_API
-      ? new URL(process.env.NEXT_PUBLIC_MEALDB_API).origin
-      : "https://www.themealdb.com";
-
-    if (cocktailDomain) {
-      const link = document.createElement("link");
-      link.rel = "preconnect";
-      link.href = cocktailDomain;
-      document.head.appendChild(link);
-    }
-
-    if (mealDomain) {
-      const link = document.createElement("link");
-      link.rel = "preconnect";
-      link.href = mealDomain;
-      document.head.appendChild(link);
-    }
-  }
-};
 
 /**
  * Fetches multiple random cocktails
@@ -343,6 +293,51 @@ export const searchMealsByName = async (term: string): Promise<Meal[]> => {
   } catch (error) {
     console.error('Error searching meals:', error);
     throw error;
+  }
+};
+
+export const fetchCocktailsByCategory = async (category: string): Promise<Cocktail[]> => {
+  try {
+    const cacheKey = `cocktail_category_${category}`;
+    const data = await cachedRequest<CocktailResponse>(
+      cocktailApi,
+      `/filter.php?c=${encodeURIComponent(category)}`,
+      cacheKey
+    );
+    return data.drinks || [];
+  } catch (error) {
+    console.error('Error fetching cocktails by category:', error);
+    return [];
+  }
+};
+
+export const fetchMealsByCategory = async (category: string): Promise<Meal[]> => {
+  try {
+    const cacheKey = `meal_category_${category}`;
+    const data = await cachedRequest<MealResponse>(
+      mealApi,
+      `/filter.php?c=${encodeURIComponent(category)}`,
+      cacheKey
+    );
+    return data.meals || [];
+  } catch (error) {
+    console.error('Error fetching meals by category:', error);
+    return [];
+  }
+};
+
+export const fetchMealsByArea = async (area: string): Promise<Meal[]> => {
+  try {
+    const cacheKey = `meal_area_${area}`;
+    const data = await cachedRequest<MealResponse>(
+      mealApi,
+      `/filter.php?a=${encodeURIComponent(area)}`,
+      cacheKey
+    );
+    return data.meals || [];
+  } catch (error) {
+    console.error('Error fetching meals by area:', error);
+    return [];
   }
 };
 

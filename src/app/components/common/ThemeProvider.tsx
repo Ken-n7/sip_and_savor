@@ -3,7 +3,7 @@
 import * as React from 'react';
 import { ThemeProvider as NextThemesProvider, useTheme as useNextTheme } from 'next-themes';
 import type { ThemeProviderProps } from 'next-themes';
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { THEMES, ThemeKey } from '../../lib/theme';
  
 export function ThemeProvider({ children, ...props }: ThemeProviderProps) {
@@ -46,8 +46,7 @@ export function ThemeProvider({ children, ...props }: ThemeProviderProps) {
     
   }, [colorTheme, mounted]);
   
-  // Function to update theme variables based on current dark/light mode
-  const updateThemeVariables = () => {
+  const updateThemeVariables = useCallback(() => {
     // Detect if currently in dark mode
     const isDarkMode = document.documentElement.classList.contains('dark');
     
@@ -62,9 +61,8 @@ export function ThemeProvider({ children, ...props }: ThemeProviderProps) {
       isDarkMode ? 'var(--background-dark)' : 'var(--background-light)');
     document.documentElement.style.setProperty('--foreground', 
       isDarkMode ? 'var(--text-dark)' : 'var(--text-light)');
-  };
-  
-  // Monitor for theme changes
+  }, []);
+
   useEffect(() => {
     if (!mounted) return;
     
@@ -84,9 +82,8 @@ export function ThemeProvider({ children, ...props }: ThemeProviderProps) {
     // Start observing the document with the configured parameters
     observer.observe(document.documentElement, { attributes: true });
     
-    // Cleanup
     return () => observer.disconnect();
-  }, [mounted]);
+  }, [mounted, updateThemeVariables]);
 
   // Context to share color theme state
   const colorThemeContext = React.useMemo(() => ({
@@ -100,9 +97,7 @@ export function ThemeProvider({ children, ...props }: ThemeProviderProps) {
   return (
     <ColorThemeContext.Provider value={colorThemeContext}>
       <NextThemesProvider disableTransitionOnChange {...props}>
-        <div className="min-h-screen">
-          {children}
-        </div>
+        {children}
       </NextThemesProvider>
     </ColorThemeContext.Provider>
   );

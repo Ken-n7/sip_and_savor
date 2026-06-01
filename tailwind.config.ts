@@ -1,6 +1,6 @@
-// tailwind.config.js
-/** @type {import('tailwindcss').Config} */
-module.exports = {
+import type { Config } from 'tailwindcss';
+
+const config: Config = {
   darkMode: ["class"],
   content: [
     './pages/**/*.{ts,tsx}',
@@ -12,15 +12,27 @@ module.exports = {
     extend: {
       colors: {
         border: "hsl(var(--border))",
-        primary: "hsl(var(--primary))",
+        primary: {
+          DEFAULT: "hsl(var(--primary))",
+          foreground: "hsl(var(--primary-foreground))",
+        },
         secondary: "hsl(var(--secondary))",
-        accent: "hsl(var(--accent))",
+        accent: {
+          DEFAULT: "hsl(var(--accent))",
+          foreground: "hsl(var(--foreground))",
+        },
         background: "hsl(var(--background))",
         foreground: "hsl(var(--foreground))",
         muted: {
           DEFAULT: "hsl(var(--muted))",
           foreground: "hsl(var(--muted-foreground))",
         },
+        destructive: {
+          DEFAULT: "hsl(var(--destructive))",
+          foreground: "hsl(var(--primary-foreground))",
+        },
+        input: "hsl(var(--border))",
+        ring: "hsl(var(--primary))",
       },
       animation: {
         'fade-in': 'fadeIn 0.5s ease-out',
@@ -44,4 +56,6 @@ module.exports = {
     },
   },
   plugins: [],
-}
+};
+
+export default config;

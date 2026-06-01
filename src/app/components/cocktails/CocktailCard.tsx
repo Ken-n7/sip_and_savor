@@ -1,6 +1,7 @@
 import Image from 'next/image';
 import Link from 'next/link';
 import { Cocktail } from '@/types/recipe';
+import { FavoriteButton } from '@/app/components/common/FavoriteButton';
 
 interface CocktailCardProps {
   cocktail: Cocktail;
@@ -12,11 +13,10 @@ const CocktailCard = ({ cocktail }: CocktailCardProps) => {
       className="group bg-background rounded-lg shadow-sm hover:shadow-md transition-all duration-200 ease-in-out overflow-hidden border border-border flex flex-col h-full"
       aria-labelledby={`cocktail-${cocktail.idDrink}-title`}
     >
-      <Link 
-        href={`/cocktail/${cocktail.idDrink}`} 
+      <Link
+        href={`/cocktail/${cocktail.idDrink}`}
         className="flex flex-col h-full"
         prefetch={false}
-        aria-label={`View details for ${cocktail.strDrink}`}
       >
         <div className="relative aspect-[4/3] overflow-hidden bg-muted">
           <Image
@@ -30,6 +30,11 @@ const CocktailCard = ({ cocktail }: CocktailCardProps) => {
             placeholder="blur"
             blurDataURL="data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMzIwIiBoZWlnaHQ9IjMyMCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIiB2ZXJzaW9uPSIxLjEiLz4="
           />
+          <div className="absolute top-2 right-2">
+            <FavoriteButton
+              item={{ id: cocktail.idDrink, type: 'cocktail', name: cocktail.strDrink, thumb: cocktail.strDrinkThumb }}
+            />
+          </div>
         </div>
         
         <div className="p-3 flex flex-col flex-grow">
@@ -43,7 +48,7 @@ const CocktailCard = ({ cocktail }: CocktailCardProps) => {
           
           <h3 
             id={`cocktail-${cocktail.idDrink}-title`}
-            className="text-md font-semibold text-foreground line-clamp-1 mb-2"
+            className="text-base font-semibold text-foreground line-clamp-1 mb-2"
           >
             {cocktail.strDrink}
           </h3>
